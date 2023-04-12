@@ -456,7 +456,7 @@ void ADC_SetParametres(ADS131M08 ADC_ADC131){
     delay(100);
   }
   
- 
+ //ggg
     // Read the registers list
   for (int i = 0; i < 49; i++) {
     ADC_ADC131.readReg(ADC_Registers_Add[i]);
@@ -465,7 +465,7 @@ void ADC_SetParametres(ADS131M08 ADC_ADC131){
     Serial.print(" value: ");
     Serial.println(ADC_Registers_Val[i]);
   } 
-  
+
   };
 
   void ADC_Handler(ADS131M08 ADC_ADC131){

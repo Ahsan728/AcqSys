@@ -9,7 +9,7 @@
 // Type Defines and Constants
 #define LED_PIN  6 //Led Pin: Typical Arduino Board
 #define ERROR_LED_LIGHTUP_STATE  HIGH // the state that makes the led light up on your board, either low or high
-#define SERIAL          SerialUSB //Sparkfun Samd21 Boards
+#define SERIAL          SerialUSB // Samd21 Boards
 
 // global variables
 //Taskes
@@ -18,13 +18,13 @@ TaskHandle_t  Handle_LEDUpdate;
 TaskHandle_t  Handle_PBUpdate;
 
 // LED Counters and declarations
-uint16_t      LED_ON_Duration = 1;  //  Durée ou la LED est allumée en 100ms,        
-uint16_t      LED_Blink_Number = 3; //  Nombre de clignotement
-uint16_t      LED_Short = 6;        // Periode de clignoement courte: 10x100ms
-uint16_t      LED_Long = 10*10;     // Periode de clignotement longue: 10x10x100ms secondes
-uint16_t      LED_Long_Count = 1;   // Compteur qui ballaie la periode la plus long du clighotement, i.e 10sec... 
-uint16_t      LED_Short_Count = 1;  // Compteur sur la petite periode 
-uint16_t      LED_Blink_Count = 1;  // Nombre de blinks faits 
+uint16_t      LED_ON_Duration = 1;  //  Duration when the LED is on in 100ms,        
+uint16_t      LED_Blink_Number = 3; //  Number of flashes
+uint16_t      LED_Short = 6;        // Short flashing period: 10x100ms
+uint16_t      LED_Long = 10*10;     // Long flashing period: 10x10x100ms seconds
+uint16_t      LED_Long_Count = 1;   // Counter that sweeps the longest period of the blink, ie 10sec... 
+uint16_t      LED_Short_Count = 1;  // Counter on the small period
+uint16_t      LED_Blink_Count = 1;  // Number of blinks done
 #define       LED_State1  1
 #define       LED_State2  2
 #define       LED_State3  3
@@ -34,14 +34,14 @@ void LEDSetTimings(int16_t LED_State);
 // Push semaphore and period
 #define       PB_DigIN          21 //  3*100ms
 #define       PB_ReadingPeriod  3 //  3*100ms
-bool          PB_Debound_Table[3] =   {0, 0, 0};    //  Lecture de valure successive
-int           PB_Debound_Counter = 1;   // Lectures de 1 à la longeure de PB_Debound_Table
-bool          PB_Semaphore =    0;     //  Durée ou la LED est allumée en 100ms,        
+bool          PB_Debound_Table[3] =   {0, 0, 0};    //  Read successive value
+int           PB_Debound_Counter = 1;   // Readings of 1 to the length of PB_Debound_Table
+bool          PB_Semaphore =    0;     //  Duration where the LED is on in 100ms,       
 void          PBHandler(void);
 
 // ADC and DAC variables
 //ADC SPI Parameters;
-#define ADC_CS          14       // à corriger
+#define ADC_CS          14       // to correct
 #define ADC_CS1         6        // same as the ADC that is not used
 #define ADC_XTAL_PIN    7        //
 #define ADC_XTAL_VAL    2        // 2.048MHZ

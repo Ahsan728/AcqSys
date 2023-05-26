@@ -45,7 +45,7 @@
  *----------------------------------------------------------*/
 
 
-#define configUSE_PREEMPTION			1
+#define configUSE_PREEMPTION			1	//Constant defines whether the co-operative or pre-emptive scheduling algorithm will be used
 #define configUSE_IDLE_HOOK				1
 #define configUSE_TICK_HOOK				0
 #define configCPU_CLOCK_HZ				( ( unsigned long ) F_CPU  )

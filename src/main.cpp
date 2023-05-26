@@ -9,7 +9,14 @@
 // Type Defines and Constants
 #define LED_PIN  6 //Led Pin: Typical Arduino Board
 #define ERROR_LED_LIGHTUP_STATE  HIGH // the state that makes the led light up on your board, either low or high
-#define SERIAL          SerialUSB // Samd21 Boards
+#define SERIAL          SerialUSB //Sparkfun Samd21 Boards
+
+// Function to get the amount of free memory
+extern "C" char* sbrk(int incr);
+int freeMemory() {
+  char top;
+  return &top - reinterpret_cast<char*>(sbrk(0));
+}
 
 // global variables
 //Taskes
@@ -18,13 +25,13 @@ TaskHandle_t  Handle_LEDUpdate;
 TaskHandle_t  Handle_PBUpdate;
 
 // LED Counters and declarations
-uint16_t      LED_ON_Duration = 1;  //  Duration when the LED is on in 100ms,        
-uint16_t      LED_Blink_Number = 3; //  Number of flashes
-uint16_t      LED_Short = 6;        // Short flashing period: 10x100ms
-uint16_t      LED_Long = 10*10;     // Long flashing period: 10x10x100ms seconds
-uint16_t      LED_Long_Count = 1;   // Counter that sweeps the longest period of the blink, ie 10sec... 
-uint16_t      LED_Short_Count = 1;  // Counter on the small period
-uint16_t      LED_Blink_Count = 1;  // Number of blinks done
+uint16_t      LED_ON_Duration = 1;  //  Durée ou la LED est allumée en 100ms,        
+uint16_t      LED_Blink_Number = 3; //  Nombre de clignotement
+uint16_t      LED_Short = 6;        // Periode de clignoement courte: 10x100ms
+uint16_t      LED_Long = 10*10;     // Periode de clignotement longue: 10x10x100ms secondes
+uint16_t      LED_Long_Count = 1;   // Compteur qui ballaie la periode la plus long du clighotement, i.e 10sec... 
+uint16_t      LED_Short_Count = 1;  // Compteur sur la petite periode 
+uint16_t      LED_Blink_Count = 1;  // Nombre de blinks faits 
 #define       LED_State1  1
 #define       LED_State2  2
 #define       LED_State3  3
@@ -34,14 +41,14 @@ void LEDSetTimings(int16_t LED_State);
 // Push semaphore and period
 #define       PB_DigIN          21 //  3*100ms
 #define       PB_ReadingPeriod  3 //  3*100ms
-bool          PB_Debound_Table[3] =   {0, 0, 0};    //  Read successive value
-int           PB_Debound_Counter = 1;   // Readings of 1 to the length of PB_Debound_Table
-bool          PB_Semaphore =    0;     //  Duration where the LED is on in 100ms,       
+bool          PB_Debound_Table[3] =   {0, 0, 0};    //  Lecture de valure successive
+int           PB_Debound_Counter = 1;   // Lectures de 1 à la longeure de PB_Debound_Table
+bool          PB_Semaphore =    0;     //  Durée ou la LED est allumée en 100ms,        
 void          PBHandler(void);
 
 // ADC and DAC variables
 //ADC SPI Parameters;
-#define ADC_CS          14       // to correct
+#define ADC_CS          14       // à corriger
 #define ADC_CS1         6        // same as the ADC that is not used
 #define ADC_XTAL_PIN    7        //
 #define ADC_XTAL_VAL    2        // 2.048MHZ
@@ -52,7 +59,7 @@ ADS131M08 ADC_ADC131(ADC_CS, ADC_XTAL_PIN, ADC_DRDY_PIN, SPI_FREQ);
 
 
 // DAC Parameters and waveforms
-#define DAC_ANALOG_RESOLUTION 10
+#define DAC_ANALOG_RESOLUTION 100
 uint16_t DAC_Waveform[] = { 
     128,131,134,137,140,143,146,149,152,155,158,162,165,167,170,173,
     176,179,182,185,188,190,193,196,198,201,203,206,208,211,213,215,
@@ -79,10 +86,11 @@ uint32_t S_Lentgh = 100;// Variable Cloud Number of Samples per channel
 int Commande = 0;  // Variable Cloud
 static uint32_t DAC_loopCount = 0;
 static uint32_t S_loopCount = S_Lentgh;
-int32_t Samples_32b[8] = {}; 
+int32_t Samples_32b[8] = {};
+int32_t Samples_32b_Buffer[8*100] = {};   // 8 par S_Lentgh   
 int ADCSetting[] = {0b1111111100011111}; 
 
-long NumberOfSamples = 100;
+
 
 void ADC_SetParametres(ADS131M08 ADC_ADC131);
 void ADC_Handler(ADS131M08 ADC_ADC131);
@@ -148,7 +156,6 @@ static void BPUpdate( void *pvParameters )
     myDelayMs(100);
   }
 }
-
 //Register Table 
 uint16_t ADC_Registers_Val[49] = {
  ADS131_MODE_VAL, 
@@ -254,7 +261,6 @@ uint16_t ADC_Registers_Add[49] = {
  ADS131_REGMAP_CRC,
  ADS131_RESERVED
 };
-void ADC_SetParametres(ADS131M08 ADC_ADC131);
 
 // ************************************SetUp***********************************************
 void setup() 
@@ -264,11 +270,14 @@ void setup()
   Serial.begin(9600);
   delay(1000); // prevents usb driver crash on startup, do not omit this
   while (!Serial) ;  // Wait for serial terminal to open port before starting program
-
-  Serial.println("");
-  Serial.println("******************************");
-  Serial.println("        Program start         ");
-  Serial.println("******************************");
+  const char message1[] PROGMEM = "";
+  const char message2[] PROGMEM = "******************************";
+  const char message3[] PROGMEM = "        Program start         ";
+  const char message4[] PROGMEM = "******************************";
+  Serial.println(F(message1));
+  Serial.println(F(message2));
+  Serial.println(F(message3));
+  Serial.println(F(message4));
   Serial.flush();
 
   // Push Button setup
@@ -302,12 +311,14 @@ void setup()
   vSetErrorSerial(&Serial);
 
   // Create the threads that will be managed by the rtos
+  //  Amine
    xTaskCreate(CloudUpdate,     "Cloud Update",       2560, NULL, tskIDLE_PRIORITY + 1, &Handle_CloudUpdate);
    xTaskCreate(LEDUpdate,       "LED Update",         256,  NULL, tskIDLE_PRIORITY + 2, &Handle_LEDUpdate);
    xTaskCreate(BPUpdate,        "BP Update",          256,  NULL, tskIDLE_PRIORITY + 3, &Handle_PBUpdate);
  
 
   // Cloud Setup
+  // Amine
   LEDSetTimings(LED_State2);
   initProperties();
   ArduinoCloud.begin(ArduinoIoTPreferredConnection);
@@ -421,9 +432,10 @@ void PBHandler(void){
       
       //Synchronisation Cloud
       ADC_Handler(ADC_ADC131);    // Acquire Signals
+      //Amine
       ArduinoCloud.update();      // Send data back
       digitalWrite(LED_BUILTIN,HIGH);
-      SERIAL.print("\n Cloud Updat base on PB\n");
+      SERIAL.print("\n Cloud Update base on PB\n");
       SERIAL.flush();
       delay(2000);
       digitalWrite(LED_BUILTIN, LOW);
@@ -447,32 +459,13 @@ void ADC_SetParametres(ADS131M08 ADC_ADC131){
   uint16_t gainreg = ADC_ADC131.readReg(ADS131_GAIN1);
   Serial.print("CLOCK: ");
   Serial.println(clkreg,BIN);
-
-
-    // write to registers list
-  for (int i = 0; i < 49; i++) {
-    ADC_ADC131.writeReg(ADC_Registers_Add[i], ADC_Registers_Val[i]);
-    Serial.println("Register ");
-    Serial.println(ADC_Registers_Add[i]);
-    Serial.println(" value: ");
-    Serial.println(ADC_Registers_Val[i]);
-    delay(100);
-  }
-  
- 
-    // Read the registers list
-  for (int i = 0; i < 49; i++) {
-    ADC_ADC131.readReg(ADC_Registers_Add[i]);
-    Serial.print("Register ");
-    Serial.print(ADC_Registers_Add[i]);
-    Serial.print(" value: ");
-    Serial.println(ADC_Registers_Val[i]);
-  } 
-
   };
 
   void ADC_Handler(ADS131M08 ADC_ADC131){
-      Serial.println("The samples are as follows");          // Print data in channel 1.
+      char result[8*100] = "";
+      char element[12];
+      const char message5[] PROGMEM = "The samples are as follows";
+      Serial.println(F(message5));          // Print data in channel 1.
       S_loopCount = S_Lentgh;
       while (S_loopCount > 0)
       {
@@ -480,7 +473,11 @@ void ADC_SetParametres(ADS131M08 ADC_ADC131){
             //Serial.println(S_loopCount);
             // Read Data
             ADC_ADC131.readAllChannels(Samples_32b);
-            //Serial.println(Samples_8b[0]);          // Print data in channel 1.
+              for (uint8_t i = 0; i <= 7; i++)
+              {
+                Samples_32b_Buffer[i*S_Lentgh + S_Lentgh-S_loopCount] = Samples_32b[i];
+              }
+            //Serial.println(Samples_32b[0]);          // Print data in channel 1.
             // Output to the DAC
             analogWrite( A0, DAC_Waveform[DAC_loopCount]/1);
             DAC_loopCount = DAC_loopCount + 1;
@@ -489,9 +486,27 @@ void ADC_SetParametres(ADS131M08 ADC_ADC131){
           }
           else {}
       }
-      int8_t *Samples_8b = reinterpret_cast<int8_t *>(Samples_32b);
-      cloudSamples = String((char *)Samples_8b);
-      Serial.println(cloudSamples[0]);
-  }
 
+      //char *Samples_8b_Buffer = reinterpret_cast<char *>(Samples_32b_Buffer);
+      //for (uint16_t i = 0; i <= 4*8* S_Lentgh-1; i++)
+      //{
+      //    Serial.println(Samples_8b_Buffer[i]);
+      //}
 
+      //cloudSamples = String((char *)Samples_8b_Buffer);
+      for (uint16_t i = 0; i <= 10; i++)  // 8* S_Lentgh-1
+      {
+          sprintf(element, "%d", Samples_32b_Buffer[i]);
+          strcat(result, element);
+          strcat(result, ";");
+      }
+     cloudSamples = result;
+
+  int memory = freeMemory();
+  const char message6[] PROGMEM = "Free Memory: ";
+  Serial.print(F(message6));
+  Serial.print(memory);
+  const char message7[] PROGMEM = " bytes";
+  Serial.println(F(message7));
+  Serial.println(cloudSamples);
+}

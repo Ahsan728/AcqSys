@@ -5,6 +5,7 @@
 #include <thingProperties.h>
 #include "ADS131M08.h"
 #include "SAMD21turboPWM.h"
+#include "PostProcessing.h"
 
 // Type Defines and Constants
 #define LED_PIN  6 //Led Pin: Typical Arduino Board
@@ -94,10 +95,6 @@ int ADCSetting[] = {0b1111111100011111};
 
 void ADC_SetParametres(ADS131M08 ADC_ADC131);
 void ADC_Handler(ADS131M08 ADC_ADC131);
-
-
-
-
 
 // Can use these function for RTOS delays
 void myDelayUs(int us)
@@ -296,7 +293,7 @@ void setup()
       pinMode( A0, OUTPUT );
       analogWriteResolution( DAC_ANALOG_RESOLUTION );
 
-
+    //PostProcessing_initialize(); //Initializing the feature extraction
   // Set the led the rtos will blink when we have a fatal rtos error
   // RTOS also Needs to know if high/low is the state that turns on the led.
   // Error Blink Codes:

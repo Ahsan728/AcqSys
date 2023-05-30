@@ -19,11 +19,11 @@ int freeMemory() {
   return &top - reinterpret_cast<char*>(sbrk(0));
 }
 
-// global variables
-//Taskes
+// global variables Tasks
 TaskHandle_t  Handle_CloudUpdate;
 TaskHandle_t  Handle_LEDUpdate;
 TaskHandle_t  Handle_PBUpdate;
+TaskHandle_t  Handle_RMSUpdate;
 
 // LED Counters and declarations
 uint16_t      LED_ON_Duration = 1;  //  Durée ou la LED est allumée en 100ms,        
@@ -153,6 +153,21 @@ static void BPUpdate( void *pvParameters )
     myDelayMs(100);
   }
 }
+
+static void RMSUpdate( void *pvParameters ) 
+{
+  SERIAL.println("RMS Update: Started");
+
+  while(1)
+  {
+    LEDHandler();
+    myDelayMs(100);
+  }
+   // delete ourselves.
+  SERIAL.println("Cloud Update: Deleting");
+  vTaskDelete( NULL );
+}
+
 //Register Table 
 uint16_t ADC_Registers_Val[49] = {
  ADS131_MODE_VAL, 
@@ -312,6 +327,7 @@ void setup()
    xTaskCreate(CloudUpdate,     "Cloud Update",       2560, NULL, tskIDLE_PRIORITY + 1, &Handle_CloudUpdate);
    xTaskCreate(LEDUpdate,       "LED Update",         256,  NULL, tskIDLE_PRIORITY + 2, &Handle_LEDUpdate);
    xTaskCreate(BPUpdate,        "BP Update",          256,  NULL, tskIDLE_PRIORITY + 3, &Handle_PBUpdate);
+   xTaskCreate(RMSUpdate,        "RMS Update",        256,  NULL, tskIDLE_PRIORITY + 4, &Handle_RMSUpdate);
  
 
   // Cloud Setup

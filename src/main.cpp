@@ -160,7 +160,7 @@ static void RMSUpdate( void *pvParameters )
 
   while(1)
   {
-    LEDHandler();
+    PostProcessing_step();
     myDelayMs(100);
   }
    // delete ourselves.
@@ -324,19 +324,19 @@ void setup()
 
   // Create the threads that will be managed by the rtos
   //  Amine
-   xTaskCreate(CloudUpdate,     "Cloud Update",       2560, NULL, tskIDLE_PRIORITY + 1, &Handle_CloudUpdate);
-   xTaskCreate(LEDUpdate,       "LED Update",         256,  NULL, tskIDLE_PRIORITY + 2, &Handle_LEDUpdate);
-   xTaskCreate(BPUpdate,        "BP Update",          256,  NULL, tskIDLE_PRIORITY + 3, &Handle_PBUpdate);
-   xTaskCreate(RMSUpdate,        "RMS Update",        256,  NULL, tskIDLE_PRIORITY + 4, &Handle_RMSUpdate);
+   //xTaskCreate(CloudUpdate,     "Cloud Update",       2560, NULL, tskIDLE_PRIORITY + 1, &Handle_CloudUpdate);
+   xTaskCreate(LEDUpdate,       "LED Update",         256,  NULL, tskIDLE_PRIORITY + 1, &Handle_LEDUpdate);
+   xTaskCreate(BPUpdate,        "BP Update",          2560,  NULL, tskIDLE_PRIORITY + 2, &Handle_PBUpdate);
+   xTaskCreate(RMSUpdate,        "RMS Update",        256,  NULL, tskIDLE_PRIORITY + 3, &Handle_RMSUpdate);
  
 
   // Cloud Setup
   // Amine
-  LEDSetTimings(LED_State2);
-  initProperties();
-  ArduinoCloud.begin(ArduinoIoTPreferredConnection);
-  setDebugMessageLevel(2);
-  ArduinoCloud.printDebugInfo();
+  //LEDSetTimings(LED_State2);
+  //initProperties();
+  //ArduinoCloud.begin(ArduinoIoTPreferredConnection);
+  //setDebugMessageLevel(2);
+  //ArduinoCloud.printDebugInfo();
 
   // Start the RTOS, this function will never return and will schedule the tasks.
   vTaskStartScheduler();
@@ -446,12 +446,12 @@ void PBHandler(void){
       //Synchronisation Cloud
       ADC_Handler(ADC_ADC131);    // Acquire Signals
       //Amine
-      ArduinoCloud.update();      // Send data back
-      digitalWrite(LED_BUILTIN,HIGH);
-      SERIAL.print("\n Cloud Update base on PB\n");
-      SERIAL.flush();
-      delay(2000);
-      digitalWrite(LED_BUILTIN, LOW);
+      //ArduinoCloud.update();      // Send data back
+      //digitalWrite(LED_BUILTIN,HIGH);
+      //SERIAL.print("\n Cloud Update base on PB\n");
+      //SERIAL.flush();
+      //delay(2000);
+      //digitalWrite(LED_BUILTIN, LOW);
     }else{PB_Semaphore=0;}
 }
 
@@ -522,4 +522,34 @@ void ADC_SetParametres(ADS131M08 ADC_ADC131){
   const char message7[] PROGMEM = " bytes";
   Serial.println(F(message7));
   Serial.println(cloudSamples);
+  
+  
+}
+
+void PostProcessing_step(void)
+{
+    rtDW.RMS_Iteration++; //increments the value of the variable rtDW.RMS_Iteration by 1
+  if (rtDW.RMS_Iteration > 1U) {
+    rtDW.RMS_SqData += rtU.Samples_32b * rtU.Samples_32b;
+    //The value of rtU.Samples_32b is squared (rtU.Samples_32b * rtU.Samples_32b) and added to the variable rtDW.RMS_SqData.
+    /* Outport: '<Root>/Out_RMS' incorporates:
+     *  Inport: '<Root>/Samples_32b'
+     */
+    rtY.Out_RMS = sqrt(rtDW.RMS_SqData / (real_T)rtDW.RMS_Iteration);
+    Serial.println(rtY.Out_RMS);
+    //The square root of the ratio between rtDW.RMS_SqData and rtDW.RMS_Iteration is calculated using the sqrt() function. 
+    //The result is assigned to rtY.Out_RMS.
+  } else {
+    if (rtDW.RMS_Iteration == 0U) {
+      rtDW.RMS_Iteration = 1U;
+    }//If rtDW.RMS_Iteration is 0, it is assigned the value 1 to ensure it is at least 1
+    rtDW.RMS_SqData = rtU.Samples_32b * rtU.Samples_32b;
+    //The value of rtU.Samples_32b is squared, and the result is assigned to rtDW.RMS_SqData.
+    /* Outport: '<Root>/Out_RMS' incorporates:
+     *  Inport: '<Root>/Samples_32b'
+     */
+    rtY.Out_RMS = fabs(rtU.Samples_32b);
+   Serial.println(rtY.Out_RMS);
+    //The absolute value of rtU.Samples_32b is calculated using the fabs() function, and the result is assigned to rtY.Out_RMS.
+  }
 }

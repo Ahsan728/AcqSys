@@ -14,6 +14,7 @@ The [ADS131M08](https://www.ti.com/product/ADS131M08?utm_source=google&utm_mediu
 
 
 
+
 ## Testing with Texas instrument ADS131M08 module
 The [ADS131M08EVM kit](https://www.ti.com/tool/ADS131M08EVM#overview) includes the ADS131M08EVM board and a precision host interface (PHI) controller board. At first we integrated this board with our Arduino MKR board to read the data from 8 channels. Because of having in built hardware clock generator this evalution module served sample data smoothly.
 
@@ -31,6 +32,9 @@ Figure: Our designed PCB layout
 
 
 ## PCBA Assembly Prototype
+
+
+
 
 ## Firmware Design
 - ADS131MO8 Library 

@@ -5,11 +5,11 @@ like voltage, current, temperature, and noise. This system will have high accura
 through LTE-M. Then we will analyse the data by using MATLAB & Simulink.Finally, it could be able to run local algorithms, and connect a local MATLAB to
 the cloud to train/deploy AI algorithms. 
 
-#Testing with Texas instrument ADS131M08 module
-#Designing PCB 
-#PCBA Assembly Prototype
+## Testing with Texas instrument ADS131M08 module
+## Designing PCB 
+## PCBA Assembly Prototype
 
-#Firmware Design
+## Firmware Design
 - ADS131MO8 Library 
 - Generating Fast Clock for ADC
 - SAMD21 Turbo PWM

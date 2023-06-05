@@ -23,8 +23,8 @@ The [ADS131M08EVM kit](https://www.ti.com/tool/ADS131M08EVM#overview) includes t
 
 ## Designing PCB 
 
-<img width="450" alt="PCB Valise" src="https://github.com/Ahsan728/AcqSys/assets/34878134/17bd8811-b529-4477-8953-8109e1c3dff8">
-<img width="450" alt="Valise" src="https://github.com/Ahsan728/AcqSys/assets/34878134/d2c1920f-33a1-4cb3-a819-6a4a06f91ec3"> 
+<img width="430" alt="PCB Valise" src="https://github.com/Ahsan728/AcqSys/assets/34878134/17bd8811-b529-4477-8953-8109e1c3dff8">
+<img width="430" alt="Valise" src="https://github.com/Ahsan728/AcqSys/assets/34878134/d2c1920f-33a1-4cb3-a819-6a4a06f91ec3"> 
 
 
 Figure: Our designed PCB layout 

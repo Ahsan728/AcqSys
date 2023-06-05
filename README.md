@@ -33,6 +33,7 @@ Figure: Our designed PCB layout
 
 ## PCBA Assembly Prototype
 
+![Board](https://github.com/Ahsan728/AcqSys/assets/34878134/96a1e791-493f-470a-8af7-751b4f1ae472)
 
 
 

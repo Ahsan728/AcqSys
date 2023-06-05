@@ -6,6 +6,11 @@ through LTE-M. Then we will analyse the data by using MATLAB & Simulink.Finally,
 the cloud to train/deploy AI algorithms. 
 
 ## Testing with Texas instrument ADS131M08 module
+The ADS131M08EVM kit includes the ADS131M08EVM board and a precision host interface (PHI) controller board. At first we integrated this board with our Arduino MKR board
+to read the data from 8 channels. Because of having in built hardware clock generator this evalution module served sample data smoothly.
+![image](https://github.com/Ahsan728/AcqSys/assets/34878134/8f5f6c68-9b21-4200-a77b-786e25ffdfda)
+
+
 ## Designing PCB 
 ## PCBA Assembly Prototype
 

@@ -39,8 +39,15 @@ Figure: Our designed PCB layout
 
 ## Firmware Design
 - ADS131MO8 Library 
+
+We have started the firmware development from the [ADS131MO8 library](https://github.com/joshbrew/ADS131M08_Arduino) developed by Joshua Brewster.
+
+
 - Generating Fast Clock for ADC
 - SAMD21 Turbo PWM
+
+[SAMD21 Turbo PWM Library](https://github.com/ocrdu/Arduino_SAMD21_turbo_PWM), developed by Oscar den Uijl has been utilised to provide the 2MHz clock signal to the ADC.
+
 - Making Register Table 
 - Arduino IoT Cloud Setup
 - Reading Data from IoT cloud with Matlab

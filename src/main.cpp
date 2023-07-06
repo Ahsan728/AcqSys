@@ -7,6 +7,7 @@
 #include "SAMD21turboPWM.h"
 #include "PostProcessing.h"
 
+
 // Type Defines and Constants
 #define LED_PIN  6 //Led Pin: Typical Arduino Board
 #define ERROR_LED_LIGHTUP_STATE  HIGH // the state that makes the led light up on your board, either low or high
@@ -23,7 +24,7 @@ int freeMemory() {
 TaskHandle_t  Handle_CloudUpdate;
 TaskHandle_t  Handle_LEDUpdate;
 TaskHandle_t  Handle_PBUpdate;
-TaskHandle_t  Handle_RMSUpdate;
+
 
 // LED Counters and declarations
 uint16_t      LED_ON_Duration = 1;  //  Durée ou la LED est allumée en 100ms,        
@@ -110,6 +111,8 @@ void myDelayMsUntil(TickType_t *previousWakeTime, int ms)
   vTaskDelayUntil( previousWakeTime, (ms * 1000) / portTICK_PERIOD_US );  
 }
 
+
+
 // Definition des tasks
 static void CloudUpdate( void *pvParameters ) 
 {
@@ -152,20 +155,6 @@ static void BPUpdate( void *pvParameters )
     PBHandler();
     myDelayMs(100);
   }
-}
-
-static void RMSUpdate( void *pvParameters ) 
-{
-  SERIAL.println("RMS Update: Started");
-
-  while(1)
-  {
-    PostProcessing_step();
-    myDelayMs(100);
-  }
-   // delete ourselves.
-  SERIAL.println("Cloud Update: Deleting");
-  vTaskDelete( NULL );
 }
 
 //Register Table 
@@ -294,8 +283,6 @@ void setup()
 
   // Push Button setup
   pinMode(PB_DigIN,INPUT);
-
-
   // ADC Setup
 
     /* Start the clock for the ADC*/
@@ -307,8 +294,9 @@ void setup()
     //  Set up the DAC
       pinMode( A0, OUTPUT );
       analogWriteResolution( DAC_ANALOG_RESOLUTION );
-
-    //PostProcessing_initialize(); //Initializing the feature extraction
+ 
+  PostProcessing_step(); //Initializing the feature extraction
+  //PostProcessing_initialize();
   // Set the led the rtos will blink when we have a fatal rtos error
   // RTOS also Needs to know if high/low is the state that turns on the led.
   // Error Blink Codes:
@@ -324,19 +312,18 @@ void setup()
 
   // Create the threads that will be managed by the rtos
   //  Amine
-   //xTaskCreate(CloudUpdate,     "Cloud Update",       2560, NULL, tskIDLE_PRIORITY + 1, &Handle_CloudUpdate);
-   xTaskCreate(LEDUpdate,       "LED Update",         256,  NULL, tskIDLE_PRIORITY + 1, &Handle_LEDUpdate);
-   xTaskCreate(BPUpdate,        "BP Update",          2560,  NULL, tskIDLE_PRIORITY + 2, &Handle_PBUpdate);
-   xTaskCreate(RMSUpdate,        "RMS Update",        256,  NULL, tskIDLE_PRIORITY + 3, &Handle_RMSUpdate);
- 
+   xTaskCreate(CloudUpdate,     "Cloud Update",       2560, NULL, tskIDLE_PRIORITY + 1, &Handle_CloudUpdate);
+   xTaskCreate(LEDUpdate,       "LED Update",         256,  NULL, tskIDLE_PRIORITY + 2, &Handle_LEDUpdate);
+   xTaskCreate(BPUpdate,        "BP Update",          256,  NULL, tskIDLE_PRIORITY + 3, &Handle_PBUpdate);
+   
 
   // Cloud Setup
   // Amine
-  //LEDSetTimings(LED_State2);
-  //initProperties();
-  //ArduinoCloud.begin(ArduinoIoTPreferredConnection);
-  //setDebugMessageLevel(2);
-  //ArduinoCloud.printDebugInfo();
+  LEDSetTimings(LED_State2);
+  initProperties();
+  ArduinoCloud.begin(ArduinoIoTPreferredConnection);
+  setDebugMessageLevel(2);
+  ArduinoCloud.printDebugInfo();
 
   // Start the RTOS, this function will never return and will schedule the tasks.
   vTaskStartScheduler();
@@ -349,6 +336,10 @@ void setup()
 	  SERIAL.flush();
 	  delay(1000);
   }
+
+}
+void rt_OneStep(void)
+{
 
 }
 
@@ -446,12 +437,12 @@ void PBHandler(void){
       //Synchronisation Cloud
       ADC_Handler(ADC_ADC131);    // Acquire Signals
       //Amine
-      //ArduinoCloud.update();      // Send data back
-      //digitalWrite(LED_BUILTIN,HIGH);
-      //SERIAL.print("\n Cloud Update base on PB\n");
-      //SERIAL.flush();
-      //delay(2000);
-      //digitalWrite(LED_BUILTIN, LOW);
+      ArduinoCloud.update();      // Send data back
+      digitalWrite(LED_BUILTIN,HIGH);
+      SERIAL.print("\n Cloud Update base on PB\n");
+      SERIAL.flush();
+      delay(2000);
+      digitalWrite(LED_BUILTIN, LOW);
     }else{PB_Semaphore=0;}
 }
 
@@ -523,33 +514,4 @@ void ADC_SetParametres(ADS131M08 ADC_ADC131){
   Serial.println(F(message7));
   Serial.println(cloudSamples);
   
-  
-}
-
-void PostProcessing_step(void)
-{
-    rtDW.RMS_Iteration++; //increments the value of the variable rtDW.RMS_Iteration by 1
-  if (rtDW.RMS_Iteration > 1U) {
-    rtDW.RMS_SqData += rtU.Samples_32b * rtU.Samples_32b;
-    //The value of rtU.Samples_32b is squared (rtU.Samples_32b * rtU.Samples_32b) and added to the variable rtDW.RMS_SqData.
-    /* Outport: '<Root>/Out_RMS' incorporates:
-     *  Inport: '<Root>/Samples_32b'
-     */
-    rtY.Out_RMS = sqrt(rtDW.RMS_SqData / (real_T)rtDW.RMS_Iteration);
-    Serial.println(rtY.Out_RMS);
-    //The square root of the ratio between rtDW.RMS_SqData and rtDW.RMS_Iteration is calculated using the sqrt() function. 
-    //The result is assigned to rtY.Out_RMS.
-  } else {
-    if (rtDW.RMS_Iteration == 0U) {
-      rtDW.RMS_Iteration = 1U;
-    }//If rtDW.RMS_Iteration is 0, it is assigned the value 1 to ensure it is at least 1
-    rtDW.RMS_SqData = rtU.Samples_32b * rtU.Samples_32b;
-    //The value of rtU.Samples_32b is squared, and the result is assigned to rtDW.RMS_SqData.
-    /* Outport: '<Root>/Out_RMS' incorporates:
-     *  Inport: '<Root>/Samples_32b'
-     */
-    rtY.Out_RMS = fabs(rtU.Samples_32b);
-   Serial.println(rtY.Out_RMS);
-    //The absolute value of rtU.Samples_32b is calculated using the fabs() function, and the result is assigned to rtY.Out_RMS.
-  }
 }

@@ -6,7 +6,8 @@
 #include "ADS131M08.h"
 #include "SAMD21turboPWM.h"
 #include "PostProcessing.h"
-
+#include <rtwtypes.h>
+#include <MW_target_hardware_resources.h>
 
 // Type Defines and Constants
 #define LED_PIN  6 //Led Pin: Typical Arduino Board
@@ -336,10 +337,6 @@ void setup()
 	  SERIAL.flush();
 	  delay(1000);
   }
-
-}
-void rt_OneStep(void)
-{
 
 }
 

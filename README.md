@@ -9,8 +9,7 @@ the cloud to train/deploy AI algorithms.
 
 The [ADS131M08](https://www.ti.com/product/ADS131M08?utm_source=google&utm_medium=cpc&utm_campaign=asc-null-null-GPN_EN-cpc-pf-google-eu&utm_content=ADS131M08&ds_k=ADS131M08&DCM=yes&gclid=Cj0KCQjwj_ajBhCqARIsAA37s0w4aU0EHOuMJ_rvznhDMplgt0EuXRgVnTscBn1Xp007JM5lLw-OlZcaAjmYEALw_wcB&gclsrc=aw.ds) is a eight-channel, simultaneouslysampling, 24-bit, delta-sigma (ΔΣ), analog-to-digital converter (ADC) that offers wide dynamic range, low power, and energy-measurement-specific features, making the device an excellent fit for energy metering,power metrology, and circuit breaker applications.
 
-<img width="350" alt="ADS131MO8 ADC" src="https://github.com/Ahsan728/AcqSys/blob/main/12aa6594544afb753217d5977a6ac90a.jpg">
-<img width="350" alt="Block ADC" src="https://github.com/Ahsan728/AcqSys/blob/main/TI_ADS131M08_blkdia.jpg">
+<img width="300" alt="ADS131MO8 ADC" src="https://github.com/Ahsan728/AcqSys/blob/main/12aa6594544afb753217d5977a6ac90a.jpg"><img width="350" alt="Block ADC" src="https://github.com/Ahsan728/AcqSys/blob/main/TI_ADS131M08_blkdia.jpg">
 
 
 

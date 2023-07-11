@@ -4,13 +4,13 @@ usually connected to the system. To solve this issue this firmware proposes to D
 like voltage, current, temperature, and noise. This system will have high accuracy on battery and low power and will be connected to the cloud
 through LTE-M. Then we will analyse the data by using MATLAB & Simulink.Finally, it could be able to run local algorithms, and connect a local MATLAB to
 the cloud to train/deploy AI algorithms. 
-<img width="300" alt="Acqsys" src="https://github.com/Ahsan728/AcqSys/blob/main/Acqsys.jpg">
+<img width="500" alt="Acqsys" src="https://github.com/Ahsan728/AcqSys/blob/main/Acqsys.jpg">
 
 ## ADS131M08 24-bit, 32-kSPS, 8-channel, simultaneous-sampling, delta-sigma ADC
 
 The [ADS131M08](https://www.ti.com/product/ADS131M08?utm_source=google&utm_medium=cpc&utm_campaign=asc-null-null-GPN_EN-cpc-pf-google-eu&utm_content=ADS131M08&ds_k=ADS131M08&DCM=yes&gclid=Cj0KCQjwj_ajBhCqARIsAA37s0w4aU0EHOuMJ_rvznhDMplgt0EuXRgVnTscBn1Xp007JM5lLw-OlZcaAjmYEALw_wcB&gclsrc=aw.ds) is a eight-channel, simultaneouslysampling, 24-bit, delta-sigma (ΔΣ), analog-to-digital converter (ADC) that offers wide dynamic range, low power, and energy-measurement-specific features, making the device an excellent fit for energy metering,power metrology, and circuit breaker applications.
 
-<img width="300" alt="ADS131MO8 ADC" src="https://github.com/Ahsan728/AcqSys/blob/main/12aa6594544afb753217d5977a6ac90a.jpg"><img width="350" alt="Block ADC" src="https://github.com/Ahsan728/AcqSys/blob/main/Block%20ADC.PNG">
+<img width="350" alt="ADS131MO8 ADC" src="https://github.com/Ahsan728/AcqSys/blob/main/12aa6594544afb753217d5977a6ac90a.jpg"><img width="400" alt="Block ADC" src="https://github.com/Ahsan728/AcqSys/blob/main/Block%20ADC.PNG">
 
 
 
@@ -24,8 +24,7 @@ The [ADS131M08EVM kit](https://www.ti.com/tool/ADS131M08EVM#overview) includes t
 
 ## Designing PCB 
 
-<img width="400" alt="PCB Valise" src="https://github.com/Ahsan728/AcqSys/blob/main/PCB%20Valise.PNG">
-<img width="400" alt="Valise" src="https://github.com/Ahsan728/AcqSys/blob/main/Valise.PNG"> 
+<img width="400" alt="PCB Valise" src="https://github.com/Ahsan728/AcqSys/blob/main/PCB%20Valise.PNG"><img width="400" alt="Valise" src="https://github.com/Ahsan728/AcqSys/blob/main/Valise.PNG"> 
 
 
 Figure: Our designed PCB layout 

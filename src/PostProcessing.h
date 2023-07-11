@@ -14,7 +14,6 @@
  *    2. RAM efficiency
  * Validation result: Not run
  */
-
 #ifndef RTW_HEADER_PostProcessing_h_
 #define RTW_HEADER_PostProcessing_h_
 #ifndef PostProcessing_COMMON_INCLUDES_

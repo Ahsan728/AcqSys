@@ -1,14 +1,16 @@
 
 // Libraries includes
 #include <arduino.h>
+
 #include <FreeRTOS_SAMD21.h>
 #include <thingProperties.h>
 #include "ADS131M08.h"
 #include "SAMD21turboPWM.h"
+extern "C" {
 #include "PostProcessing.h"
 #include <rtwtypes.h>
 #include <MW_target_hardware_resources.h>
-
+}
 // Type Defines and Constants
 #define LED_PIN  6 //Led Pin: Typical Arduino Board
 #define ERROR_LED_LIGHTUP_STATE  HIGH // the state that makes the led light up on your board, either low or high
@@ -468,12 +470,20 @@ void ADC_SetParametres(ADS131M08 ADC_ADC131){
       const char message5[] PROGMEM = "The samples are as follows";
       Serial.println(F(message5));          // Print data in channel 1.
       S_loopCount = S_Lentgh;
+      
+      // Construct the sample_100 array
+      int sample_100[800];
+      int sample_100_index = 0;
+
       while (S_loopCount > 0)
-      {
+      { //at the end of while loop construct an array register for samples_32b * 100 , show the output in a single row sample_100
         if(digitalRead(ADC_DRDY_PIN)) {
             //Serial.println(S_loopCount);
             // Read Data
             ADC_ADC131.readAllChannels(Samples_32b);
+            rtU.Samples_32b = Samples_32b[1];
+            PostProcessing_step();
+            Serial.println(rtY.Out_RMS);
               for (uint8_t i = 0; i <= 7; i++)
               {
                 Samples_32b_Buffer[i*S_Lentgh + S_Lentgh-S_loopCount] = Samples_32b[i];
@@ -483,9 +493,25 @@ void ADC_SetParametres(ADS131M08 ADC_ADC131){
             analogWrite( A0, DAC_Waveform[DAC_loopCount]/1);
             DAC_loopCount = DAC_loopCount + 1;
             if (DAC_loopCount==255) {DAC_loopCount=0;}
+            
+            
+            // Construct the sample_100 array by appending Samples_32b 
+            for (uint8_t i = 0; i < 8; i++) {
+            for (uint8_t j = 0; j < 100; j++) {
+            sample_100[sample_100_index++] = Samples_32b[i];
+            }
+            }
+
+
             S_loopCount = S_loopCount-1;
           }
           else {}
+            // Print the sample_100 array in a single row
+          for (int i = 0; i < 800; i++) {
+          Serial.print(sample_100[i]);
+          Serial.print(" ");
+          }
+          Serial.println();
       }
 
       //char *Samples_8b_Buffer = reinterpret_cast<char *>(Samples_32b_Buffer);

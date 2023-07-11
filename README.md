@@ -1,4 +1,4 @@
-# AcqSys ¨ Acquistion System
+# ADS131M08 based electrical data acquistion and supervision with LTE-M, Matlab and Arduino cloud
 During the development of AI algorithms, we need high-quality data. It is quite tough to get these data from the field because products in the field are not 
 usually connected to the system. To solve this issue this firmware proposes to Design a ready-to-run acquisition system for monitoring electrical parameters 
 like voltage, current, temperature, and noise. This system will have high accuracy on battery and low power and will be connected to the cloud

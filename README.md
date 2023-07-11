@@ -4,7 +4,7 @@ usually connected to the system. To solve this issue this firmware proposes to D
 like voltage, current, temperature, and noise. This system will have high accuracy on battery and low power and will be connected to the cloud
 through LTE-M. Then we will analyse the data by using MATLAB & Simulink.Finally, it could be able to run local algorithms, and connect a local MATLAB to
 the cloud to train/deploy AI algorithms. 
-<img width="500" alt="Acqsys" src="https://github.com/Ahsan728/AcqSys/blob/main/Acqsys.jpg">
+<img width="600" alt="Acqsys" src="https://github.com/Ahsan728/AcqSys/blob/main/Acqsys.jpg">
 
 ## ADS131M08 24-bit, 32-kSPS, 8-channel, simultaneous-sampling, delta-sigma ADC
 

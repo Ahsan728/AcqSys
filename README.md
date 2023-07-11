@@ -18,14 +18,14 @@ The [ADS131M08](https://www.ti.com/product/ADS131M08?utm_source=google&utm_mediu
 ## Testing with Texas instrument ADS131M08 module
 The [ADS131M08EVM kit](https://www.ti.com/tool/ADS131M08EVM#overview) includes the ADS131M08EVM board and a precision host interface (PHI) controller board. At first we integrated this board with our Arduino MKR board to read the data from 8 channels. Because of having in built hardware clock generator this evalution module served sample data smoothly.
 
-<img width="400" alt="Evalution" src="https://github.com/Ahsan728/AcqSys/assets/34878134/6617d9fa-873d-4db5-bdc3-74293da2058e">
+<img width="400" alt="Evalution" src="https://github.com/Ahsan728/AcqSys/blob/main/ads131m08evm-angled.png">
 
 
 
 ## Designing PCB 
 
-<img width="400" alt="PCB Valise" src="https://github.com/Ahsan728/AcqSys/assets/34878134/17bd8811-b529-4477-8953-8109e1c3dff8">
-<img width="400" alt="Valise" src="https://github.com/Ahsan728/AcqSys/assets/34878134/d2c1920f-33a1-4cb3-a819-6a4a06f91ec3"> 
+<img width="400" alt="PCB Valise" src="https://github.com/Ahsan728/AcqSys/blob/main/PCB%20Valise.PNG">
+<img width="400" alt="Valise" src="https://github.com/Ahsan728/AcqSys/blob/main/Valise.PNG"> 
 
 
 Figure: Our designed PCB layout 
@@ -33,7 +33,7 @@ Figure: Our designed PCB layout
 
 ## PCBA Assembly Prototype
 
-![Board](https://github.com/Ahsan728/AcqSys/assets/34878134/96a1e791-493f-470a-8af7-751b4f1ae472)
+<img width="400" alt="Prototype" src="https://github.com/Ahsan728/AcqSys/blob/main/Board.png"> 
 
 
 

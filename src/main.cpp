@@ -86,7 +86,7 @@ uint16_t DAC_Waveform[] = {
 };
 
 /*Acquired Channels to be sebt to the Cloud */
-uint32_t S_Lentgh = 100;// Variable Cloud Number of Samples per channel
+uint32_t S_Lentgh = 4000;// Variable Cloud Number of Samples per channel
 //int32_t *Samples_32b = (int32_t*)malloc(sizeof(int32_t)*S_Lentgh);   // Variable Cloud
 
 int Commande = 0;  // Variable Cloud
@@ -314,7 +314,7 @@ void setup()
  
   //Initializing the feature extraction
    Serial.println("I am before postprocessingInit");
-  //PostProcessing_initialize();
+  PostProcessing_initialize();
      Serial.println("I am after postprocessingInit");
   // Set the led the rtos will blink when we have a fatal rtos error
   // RTOS also Needs to know if high/low is the state that turns on the led.
@@ -352,7 +352,8 @@ void setup()
 
 //Calibration Parameters
 Serial.println("I am before Calibration");
-rtU.CalI1 = (1.25)/(2^23);
+rtU.CalI1 = 325755; 
+Serial.println(rtU.CalI1);
 rtU.CalI2 = (1.25)/(2^23);
 rtU.CalI3 = (1.25)/(2^23);
 rtU.CalI4 = (1.25)/(2^23);
@@ -505,13 +506,14 @@ void ADC_SetParametres(ADS131M08 ADC_ADC131){
       
 
       while (S_loopCount > 0)
-      { //at the end of while loop construct an array register for samples_32b * 100 , show the output in a single row sample_100
+      { 
         if(digitalRead(ADC_DRDY_PIN)) {
             //Serial.println(S_loopCount);
             // Read Data
             ADC_ADC131.readAllChannels(Samples_32b);
-            //rtU.IN = Samples_32b[0];
+           
             rtU.I1 = Samples_32b[0];
+            //Serial.println(rtU.I1 );
             rtU.I2 = Samples_32b[1];
             rtU.I3 = Samples_32b[2];
             rtU.I4 = Samples_32b[3];
@@ -521,7 +523,7 @@ void ADC_SetParametres(ADS131M08 ADC_ADC131){
             rtU.V4 = Samples_32b[7];
           
 
-            //PostProcessing_step();
+            PostProcessing_step();
             //Serial.println(Samples_32b[0]);          // Print data in channel 1.
         
             S_loopCount = S_loopCount-1;
@@ -558,28 +560,3 @@ void DACHandler(void){
             if (DAC_loopCount==255) {DAC_loopCount=0;}
             
 };
-
-
-      //char *Samples_8b_Buffer = reinterpret_cast<char *>(Samples_32b_Buffer);
-      //for (uint16_t i = 0; i <= 4*8* S_Lentgh-1; i++)
-      //{
-      //    Serial.println(Samples_8b_Buffer[i]);
-      //}
-
-      //cloudSamples = String((char *)Samples_8b_Buffer);
-   /*   for (uint16_t i = 0; i <= 10; i++)  // 8* S_Lentgh-1
-      {
-          sprintf(element, "%d", Samples_32b_Buffer[i]);
-          strcat(result, element);
-          strcat(result, ";");
-      }
-     cloudSamples = result;
-
-  int memory = freeMemory();
-  const char message6[] PROGMEM = "Free Memory: ";
-  Serial.print(F(message6));
-  Serial.print(memory);
-  const char message7[] PROGMEM = " bytes";
-  Serial.println(F(message7));
-  Serial.println(cloudSamples);
-  */

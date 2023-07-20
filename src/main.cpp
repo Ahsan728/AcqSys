@@ -7,9 +7,9 @@
 #include "ADS131M08.h"
 #include "SAMD21turboPWM.h"
 extern "C" {
-#include "PostProcessing.h"
+#include <PostProcessing.h>
 #include <rtwtypes.h>
-#include <MW_target_hardware_resources.h>
+//#include <MW_target_hardware_resources.h>
 }
 // Type Defines and Constants
 #define LED_PIN  6 //Led Pin: Typical Arduino Board
@@ -27,7 +27,7 @@ int freeMemory() {
 TaskHandle_t  Handle_CloudUpdate;
 TaskHandle_t  Handle_LEDUpdate;
 TaskHandle_t  Handle_PBUpdate;
-
+TaskHandle_t  Handle_DACUpdate;
 
 // LED Counters and declarations
 uint16_t      LED_ON_Duration = 1;  //  Durée ou la LED est allumée en 100ms,        
@@ -64,7 +64,8 @@ ADS131M08 ADC_ADC131(ADC_CS, ADC_XTAL_PIN, ADC_DRDY_PIN, SPI_FREQ);
 
 
 // DAC Parameters and waveforms
-#define DAC_ANALOG_RESOLUTION 100
+void DACHandler(void);
+#define DAC_ANALOG_RESOLUTION 10
 uint16_t DAC_Waveform[] = { 
     128,131,134,137,140,143,146,149,152,155,158,162,165,167,170,173,
     176,179,182,185,188,190,193,196,198,201,203,206,208,211,213,215,
@@ -91,9 +92,8 @@ uint32_t S_Lentgh = 100;// Variable Cloud Number of Samples per channel
 int Commande = 0;  // Variable Cloud
 static uint32_t DAC_loopCount = 0;
 static uint32_t S_loopCount = S_Lentgh;
-int32_t Samples_32b[8] = {};
-int32_t Samples_32b_Buffer[8*100] = {};   // 8 par S_Lentgh   
-int ADCSetting[] = {0b1111111100011111}; 
+int32_t Samples_32b[8] = {}; 
+int ADCSetting[] = {0b1111111100000111}; 
 
 
 
@@ -160,10 +160,21 @@ static void BPUpdate( void *pvParameters )
   }
 }
 
+static void DACUpdate( void *pvParameters ) 
+{
+  SERIAL.println("DAC update: Started");
+
+  while(1)
+  {
+    DACHandler();
+    myDelayMs(1);
+  }
+}
+
 //Register Table 
 uint16_t ADC_Registers_Val[49] = {
  ADS131_MODE_VAL, 
- ADS131_CLOCK_VAL,
+ ADS131_CLOCK_VAL,  // OSR=1024
  ADS131_GAIN1_VAL, 
  ADS131_GAIN2_VAL, 
  ADS131_CFG_VAL, 
@@ -267,6 +278,9 @@ uint16_t ADC_Registers_Add[49] = {
 };
 
 // ************************************SetUp***********************************************
+// Set up
+//xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
 void setup() 
 {
 
@@ -298,8 +312,10 @@ void setup()
       pinMode( A0, OUTPUT );
       analogWriteResolution( DAC_ANALOG_RESOLUTION );
  
-  PostProcessing_step(); //Initializing the feature extraction
+  //Initializing the feature extraction
+   Serial.println("I am before postprocessingInit");
   //PostProcessing_initialize();
+     Serial.println("I am after postprocessingInit");
   // Set the led the rtos will blink when we have a fatal rtos error
   // RTOS also Needs to know if high/low is the state that turns on the led.
   // Error Blink Codes:
@@ -315,18 +331,36 @@ void setup()
 
   // Create the threads that will be managed by the rtos
   //  Amine
-   xTaskCreate(CloudUpdate,     "Cloud Update",       2560, NULL, tskIDLE_PRIORITY + 1, &Handle_CloudUpdate);
+   xTaskCreate(CloudUpdate,     "Cloud Update",       512, NULL, tskIDLE_PRIORITY + 1, &Handle_CloudUpdate);
+   Serial.println("Cloud Task created");
    xTaskCreate(LEDUpdate,       "LED Update",         256,  NULL, tskIDLE_PRIORITY + 2, &Handle_LEDUpdate);
+   Serial.println("LED Task created");
    xTaskCreate(BPUpdate,        "BP Update",          256,  NULL, tskIDLE_PRIORITY + 3, &Handle_PBUpdate);
-   
+   Serial.println("PB Task created");
+   xTaskCreate(DACUpdate,       "DAC Update",         256,  NULL, tskIDLE_PRIORITY + 4, &Handle_DACUpdate);
+   Serial.println("DAC Task created");
 
   // Cloud Setup
   // Amine
   LEDSetTimings(LED_State2);
   initProperties();
+  Serial.println("Wifi Connected");
   ArduinoCloud.begin(ArduinoIoTPreferredConnection);
   setDebugMessageLevel(2);
   ArduinoCloud.printDebugInfo();
+  Serial.println("Cloud COnnected");
+
+//Calibration Parameters
+Serial.println("I am before Calibration");
+rtU.CalI1 = (1.25)/(2^23);
+rtU.CalI2 = (1.25)/(2^23);
+rtU.CalI3 = (1.25)/(2^23);
+rtU.CalI4 = (1.25)/(2^23);
+rtU.CalV1 = (1.25*5004.7)/(4.7*(2^23)); //Multiply 5004.7/
+rtU.CalV2 = (1.25*5004.7)/(4.7*(2^23)); 
+rtU.CalV3 = (1.25*5004.7)/(4.7*(2^23)); 
+rtU.CalV4 = (1.25*5004.7)/(4.7*(2^23)); 
+   Serial.println("I am after calibration");
 
   // Start the RTOS, this function will never return and will schedule the tasks.
   vTaskStartScheduler();
@@ -435,6 +469,7 @@ void PBHandler(void){
       
       //Synchronisation Cloud
       ADC_Handler(ADC_ADC131);    // Acquire Signals
+   
       //Amine
       ArduinoCloud.update();      // Send data back
       digitalWrite(LED_BUILTIN,HIGH);
@@ -450,30 +485,24 @@ void ADC_SetParametres(ADS131M08 ADC_ADC131){
   /* Reset the ADC */
   pinMode(RESET, OUTPUT);
   digitalWrite(RESET, LOW);
-  delay(1);
+  delay(10);
   digitalWrite(RESET, HIGH);
+   delay(10);
 
   /* Write Setting Registers*/
   ADC_ADC131.writeReg(ADS131_CLOCK,ADCSetting[0]); //Clock register (page 55 in datasheet)
-  ADC_ADC131.setGain(1);
+  //ADC_ADC131.setGain(1);
   //ADC_ADC131.globalChop(true,2);
   /* Read and check Register values*/
-  uint16_t clkreg = ADC_ADC131.readReg(ADS131_CLOCK);
-  uint16_t gainreg = ADC_ADC131.readReg(ADS131_GAIN1);
+  //uint16_t clkreg = ADC_ADC131.readReg(ADS131_CLOCK);
+  //uint16_t gainreg = ADC_ADC131.readReg(ADS131_GAIN1);
   Serial.print("CLOCK: ");
-  Serial.println(clkreg,BIN);
+  //Serial.println(clkreg,BIN);
   };
 
   void ADC_Handler(ADS131M08 ADC_ADC131){
-      char result[8*100] = "";
-      char element[12];
-      const char message5[] PROGMEM = "The samples are as follows";
-      Serial.println(F(message5));          // Print data in channel 1.
       S_loopCount = S_Lentgh;
       
-      // Construct the sample_100 array
-      int sample_100[800];
-      int sample_100_index = 0;
 
       while (S_loopCount > 0)
       { //at the end of while loop construct an array register for samples_32b * 100 , show the output in a single row sample_100
@@ -481,38 +510,55 @@ void ADC_SetParametres(ADS131M08 ADC_ADC131){
             //Serial.println(S_loopCount);
             // Read Data
             ADC_ADC131.readAllChannels(Samples_32b);
-            rtU.Samples_32b = Samples_32b[1];
-            PostProcessing_step();
-            Serial.println(rtY.Out_RMS);
-              for (uint8_t i = 0; i <= 7; i++)
-              {
-                Samples_32b_Buffer[i*S_Lentgh + S_Lentgh-S_loopCount] = Samples_32b[i];
-              }
+            //rtU.IN = Samples_32b[0];
+            rtU.I1 = Samples_32b[0];
+            rtU.I2 = Samples_32b[1];
+            rtU.I3 = Samples_32b[2];
+            rtU.I4 = Samples_32b[3];
+            rtU.V1 = Samples_32b[4];
+            rtU.V2 = Samples_32b[5];
+            rtU.V3 = Samples_32b[6];
+            rtU.V4 = Samples_32b[7];
+          
+
+            //PostProcessing_step();
             //Serial.println(Samples_32b[0]);          // Print data in channel 1.
+        
+            S_loopCount = S_loopCount-1;
+            if (S_loopCount==0)
+            {
+            Serial.println("This is the RMS Values:"); 
+            Serial.println(rtY.RMSDisplay[0]); 
+            Serial.println(rtY.RMSDisplay[1]); 
+            Serial.println(rtY.RMSDisplay[2]); 
+            Serial.println(rtY.RMSDisplay[3]); 
+
+            Serial.println("This is the Active Power Values:"); 
+            Serial.println(rtY.PowerDisplay[0]); 
+            Serial.println(rtY.PowerDisplay[2]); 
+            Serial.println(rtY.PowerDisplay[4]); 
+
+
+            Serial.println("This is the Reactive Power Values:"); 
+            Serial.println(rtY.PowerDisplay[1]); 
+            Serial.println(rtY.PowerDisplay[3]); 
+            Serial.println(rtY.PowerDisplay[5]); 
+            
+            }
+          }
+          else {}
+          }
+      }
+
+
+void DACHandler(void){
             // Output to the DAC
-            analogWrite( A0, DAC_Waveform[DAC_loopCount]/1);
+            analogWrite( A0, DAC_Waveform[DAC_loopCount]);
             DAC_loopCount = DAC_loopCount + 1;
             if (DAC_loopCount==255) {DAC_loopCount=0;}
             
-            
-            // Construct the sample_100 array by appending Samples_32b 
-            for (uint8_t i = 0; i < 8; i++) {
-            for (uint8_t j = 0; j < 100; j++) {
-            sample_100[sample_100_index++] = Samples_32b[i];
-            }
-            }
+};
 
-
-            S_loopCount = S_loopCount-1;
-          }
-          else {}
-            // Print the sample_100 array in a single row
-          for (int i = 0; i < 800; i++) {
-          Serial.print(sample_100[i]);
-          Serial.print(" ");
-          }
-          Serial.println();
-      }
 
       //char *Samples_8b_Buffer = reinterpret_cast<char *>(Samples_32b_Buffer);
       //for (uint16_t i = 0; i <= 4*8* S_Lentgh-1; i++)
@@ -521,7 +567,7 @@ void ADC_SetParametres(ADS131M08 ADC_ADC131){
       //}
 
       //cloudSamples = String((char *)Samples_8b_Buffer);
-      for (uint16_t i = 0; i <= 10; i++)  // 8* S_Lentgh-1
+   /*   for (uint16_t i = 0; i <= 10; i++)  // 8* S_Lentgh-1
       {
           sprintf(element, "%d", Samples_32b_Buffer[i]);
           strcat(result, element);
@@ -536,5 +582,4 @@ void ADC_SetParametres(ADS131M08 ADC_ADC131){
   const char message7[] PROGMEM = " bytes";
   Serial.println(F(message7));
   Serial.println(cloudSamples);
-  
-}
+  */

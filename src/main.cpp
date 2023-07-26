@@ -1,7 +1,6 @@
 
 // Libraries includes
 #include <arduino.h>
-
 #include <FreeRTOS_SAMD21.h>
 #include <thingProperties.h>
 #include "ADS131M08.h"
@@ -9,7 +8,6 @@
 extern "C" {
 #include <PostProcessing.h>
 #include <rtwtypes.h>
-//#include <MW_target_hardware_resources.h>
 }
 // Type Defines and Constants
 #define LED_PIN  6 //Led Pin: Typical Arduino Board

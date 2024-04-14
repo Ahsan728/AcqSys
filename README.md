@@ -1,8 +1,13 @@
 # ADS131M08 based electrical data acquistion and supervision with LTE-M, Matlab and Arduino cloud
 At Schneider Electric, engineers engaged in the development of AI algorithms require high-quality data samples. However, obtaining these data from the field presents challenges due to the limited connectivity of field products to the system. To address this challenge, this project proposes designing a ready-to-run acquisition system for monitoring electrical parameters such as voltage, current, temperature, and noise. This system will demonstrate high accuracy while operating efficiently on battery power, and it will establish a connection to the cloud using narrowband IoT technology, such as LTE-M. Subsequently, the acquired data will undergo analysis using local MATLAB and Simulink tools. Following the data analysis, our developed Simulink embedded algorithms will generate C code, which will then be seamlessly integrated into the firmware. This code will facilitate RMS measurements and anomaly detection for various loads.
 
+<img width="210" alt="PCB Valise" src="https://github.com/Ahsan728/AcqSys/assets/34878134/772a7bcc-7d74-44e9-a8ab-280cc6242c1f"> <img width="180" alt="Board" src="https://github.com/Ahsan728/AcqSys/assets/34878134/a25cca0b-d202-45e5-9c46-35ad21eb7e82">
+
+
+
 ## Block Diagram
-![Acqsys](https://github.com/Ahsan728/AcqSys/assets/34878134/b06272f2-f530-438e-b3c9-c1974115136c)
+<img width="580" alt="Acqsys" src="https://github.com/Ahsan728/AcqSys/assets/34878134/b06272f2-f530-438e-b3c9-c1974115136c">
+
 
 From the figure above, we can observe that this acquisition system can be accessed both manually and via a Matlab session. For the manual option, Technician2 on-site pushes the button. Then, two ADS131M08 ADCs handle the analog data from voltage contacts, current Rogowski sensors, noise, and vibration. The Arduino SAMD21 ARM Cortex M0 processor collects these analog data through SPI communication and sends them to the Arduino IoT cloud using LTE-M. The analog data becomes visible in the cloud, and this acquisition can also be controlled from a push button designed in the cloud. Internal DAC generates analog waveforms for our calibration in house R&D purpose.
 

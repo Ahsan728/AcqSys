@@ -22,6 +22,12 @@ From the figure above, we can observe that this acquisition system can be access
 
 Technician1 can analyze the sample data from the cloud using local Matlab web access. Reading from and writing to the cloud are possible through Matlab web access scripts. Technician1 can also write register values to ADCs via API oath and IoT protocol. For further feature extractions, the RMS calculation algorithm is generated using Simulink, and the resulting C codes can be integrated with the Arduino firmware. 
 
+### Hardware
+
+- Arduino MKR NB 1500
+- ADS131M08 Delta-Sigma ADC
+- Voltage , Current, Temperature, & Noise Source Contact
+
 ## ADS131M08 24-bit, 32-kSPS, 8-channel, simultaneous-sampling, delta-sigma ADC
 
 Delta-sigma ADCs are commonly used for applications that require high-resolution and high-precision analog-to-digital conversion, such as industrial instrumentation, medical devices, and data acquisition systems. Texas Instruments produces the ADS131M08 analog-to-digital converter (ADC) integrated circuit. In a physical view its a 32 pin ADC shown in figure. For applications that demand precise and dependable data conversion from analog to digital format, this high-precision, low-power, 24-bit ADC has been developed.
@@ -45,4 +51,14 @@ Algorithms that are implemented on embedded systems, which are specialized hardw
 
 We have defined 8 calibration factors in our firmware. To put those factors we have analysed the AC current samples through our serial monitor. We have supplied 1 Amp current and found analog samples shown in figure. After analysing the AC current samples from one channel, maximum sample value was 460687. From the AC currents samples figure we can assume the data rate was approximately 4KSPS. Output from oscilloscope has been depicted in the figure above, where $\color{yellow}{\textsf{YELLOW}}$ Signal represents Current sample (single channel), $\color{green}{\textsf{GREEN}}$ Signal represents the Data Ready, $\color{brown}{\textsf{BROWN}}$ Signal represents the master Clock, and $\color{blue}{\textsf{BLUE}}$ Signal represents the Data Output.
 
+## Documentation
 
+Explore full details, in-depth description here [Report PDF](https://drive.google.com/file/d/1FN8dkyus_iZ6lrGVRxJu6EXFci4fXtlX/view).
+
+## Acknowledgments
+
+Libraries has been used in this project:
+- [SAMD21 Turbo PWM](https://github.com/ocrdu/Arduino_SAMD21_turbo_PWM)
+- [Adafruit_SleepyDog](https://github.com/adafruit/Adafruit_SleepyDog)
+- [Arduino-FreeRTOS-SAMD21](https://github.com/BriscoeTech/Arduino-FreeRTOS-SAMD21/tree/master)
+- [ArduinoIoTCloud](https://github.com/arduino-libraries/ArduinoIoTCloud/tree/master)

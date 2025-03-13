@@ -3,6 +3,15 @@ At Schneider Electric, engineers engaged in the development of AI algorithms req
 
 <img width="280" alt="PCB Valise" src="https://github.com/Ahsan728/AcqSys/assets/34878134/772a7bcc-7d74-44e9-a8ab-280cc6242c1f"> <img width="260" alt="Board" src="https://github.com/Ahsan728/AcqSys/assets/34878134/a25cca0b-d202-45e5-9c46-35ad21eb7e82">
 
+## Functionality Status and Reliability
+
+| Feature       | Status  | Reliability | Notes |
+|--------------|--------|-------------|--------------------------------------------------------------------------------------------------|
+| Data Acq     | Stable | High        | Collects analog data from devices through ADS131M08 ADC and SPI |
+| Sending Cloud| Stable | High        | Uses LTEM to send the data in Arduino Cloud|
+| Matlab Session| Stable | High       | Access the data from the cloud through matlab script|
+| Simulink Algorithm| Stable | High   | Simulink Algorithm detects the anomaly in the system and provide feedback |
+| FreeRTOS  | Stable | Medium        | Handles different tasks of the firmware|
 
 
 ## Block Diagram
